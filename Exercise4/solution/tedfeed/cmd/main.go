@@ -7,24 +7,35 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+<<<<<<< HEAD
+=======
+	"sync"
+>>>>>>> b0c3149d7bd5a0e4e0534915b42a809b3da9ddfc
 
 	"encoding/xml"
 	"errors"
 
 	"io"
 
+<<<<<<< HEAD
 	"strings"
 	"sync"
 
 	//TODO change me
 	"github.com/GianniGM/GoBasicTraining/Exercise4/solution/tedfeed"
+=======
+	"tedfeed"
+>>>>>>> b0c3149d7bd5a0e4e0534915b42a809b3da9ddfc
 )
 
 const (
 	// Values used to initialize tedfeed home directory
 	tf     = "tedfeed"
 	videos = "videos"
+<<<<<<< HEAD
 	thumbs = "thumbnails"
+=======
+>>>>>>> b0c3149d7bd5a0e4e0534915b42a809b3da9ddfc
 
 	// TED.com atom feed URL
 	url = "https://www.ted.com/talks/atom"
@@ -41,6 +52,7 @@ func parse(body []byte) (*tedfeed.Feed, error) {
 	return &f, nil
 }
 
+<<<<<<< HEAD
 func download(url string, fPath string, title string, waitGroup sync.WaitGroup) {
 
 	// Decrement the counter when the goroutine completes.
@@ -69,12 +81,37 @@ func download(url string, fPath string, title string, waitGroup sync.WaitGroup) 
 	}
 
 	file.Close()
+=======
+// download retrieves the file at a given URL and saves it using the title as name
+func download(url string, fPath string, title string) error {
+
+	file, err := os.Create(filepath.Join(fPath, title))
+	if err != nil {
+		// Something went wrong creating video file, terminate
+		return err
+	}
+	defer file.Close()
+
+	resp, err := http.Get(url)
+	if err != nil {
+		// Something went wrong downloading the video, terminate
+		return err
+	}
+	defer resp.Body.Close()
+
+	_, err = io.Copy(file, resp.Body)
+	if err != nil {
+		return err
+	}
+	return nil
+>>>>>>> b0c3149d7bd5a0e4e0534915b42a809b3da9ddfc
 }
 
 func main() {
 
 	// Initializing tedfeed home directory as Exercise 1 was requesting
 	home := os.Getenv("HOME")
+<<<<<<< HEAD
 	dirs := []string{filepath.Join(home, tf, videos), filepath.Join(home, tf, thumbs)}
 
 	// Create video and thumbnails directories if they are missing
@@ -84,6 +121,14 @@ func main() {
 				// Something went wrong initializing the home, terminate
 				log.Fatalf("error: %s while creating directory: %s\n", d, err)
 			}
+=======
+	d := filepath.Join(home, tf, videos)
+	if _, err := os.Stat(d); os.IsNotExist(err) {
+		err = os.MkdirAll(d, 0755)
+		if err != nil {
+			// Something went wrong downloading the video, terminate
+			log.Fatalf("error: %s while creating directory: %s\n", d, err)
+>>>>>>> b0c3149d7bd5a0e4e0534915b42a809b3da9ddfc
 		}
 	}
 
@@ -106,6 +151,7 @@ func main() {
 		log.Fatalln("error parsing the feed")
 	}
 
+<<<<<<< HEAD
 	// Printing the title of the feed as Exercise 2 was requesting
 	log.Printf("The title of the feed is: %s\n", fd.Title)
 
@@ -133,4 +179,21 @@ func main() {
 
 	//Exercise 4: Wait for all downloads to complete.
 	waitGroup.Wait()
+=======
+	// Download videos concurrently as requested by Exercise 4
+	m := fd.GetLinksList()
+	var wg sync.WaitGroup
+	for t, link := range m {
+		wg.Add(1)
+		go func(t, link string) {
+			defer wg.Done()
+			log.Printf("Downloading %s\n", t)
+			err := download(link, d, t+".mp4")
+			if err != nil {
+				log.Printf("error downloading video: %s\n", err)
+			}
+		}(t, link)
+	}
+	wg.Wait()
+>>>>>>> b0c3149d7bd5a0e4e0534915b42a809b3da9ddfc
 }
