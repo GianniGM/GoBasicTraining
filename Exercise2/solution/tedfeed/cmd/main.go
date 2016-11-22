@@ -10,7 +10,7 @@ import (
 
 	"encoding/xml"
 	"errors"
-	"github.com/GianniGM/GoBasicTraining/Exercise2/solution/tedfeed"
+	"tedfeed"
 )
 
 const (

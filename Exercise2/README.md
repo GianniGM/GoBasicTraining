@@ -63,7 +63,7 @@ Entry:
 	Link        []Link `xml:"link"`
 
 Feed:
-	XMLName string `xml:"feed"`
+	XMLName xml.Name `xml:"feed"`
 	Updated string   `xml:"updated"`
 	Title   string   `xml:"title"`
 	Entry   []Entry  `xml:"entry"`
